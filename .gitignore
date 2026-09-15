@@ -1,0 +1,4 @@
+httpd.log
+.playwright-mcp/
+*.log
+node_modules/

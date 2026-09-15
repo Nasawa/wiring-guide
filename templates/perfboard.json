@@ -1,0 +1,16 @@
+{
+  "board": { "preset": "perf", "cols": 20, "rows": 16 },
+  "components": [
+    { "id": "u1", "label": "Your part", "socket": true, "span": [[6, 4], [9, 8]],
+      "pins": [{ "label": "A", "loc": [6, 4] }, { "label": "B", "loc": [6, 8] }] }
+  ],
+  "nets": [
+    { "id": "W1", "kind": "jumper", "from": [6, 4], "to": [12, 4], "color": "sig", "label": "example wire" }
+  ],
+  "legend": [ { "color": "sig", "label": "signal" } ],
+  "meta": {
+    "title": "Perfboard — starter template",
+    "intro": "A generic perfboard: every hole is isolated (no buses). Replace the placeholder part and wire with your own; set <code>board.cols</code> / <code>board.rows</code> to your board's hole count (or use a sized preset like <code>perf-5x7cm</code>).",
+    "buildOrder": [ "Place parts, then run wires point to point." ]
+  }
+}

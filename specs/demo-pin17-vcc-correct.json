@@ -1,0 +1,29 @@
+{
+  "mode": "point-to-point",
+  "components": [
+    {
+      "id": "pi",
+      "label": "Raspberry Pi Zero 2 W — 40-pin header",
+      "short": "Pi",
+      "hub": true,
+      "pinout": "raspberry-pi-40",
+      "pins": [{ "label": "P17 3V3" }, { "label": "P6 GND" }, { "label": "P3 SDA" }, { "label": "P5 SCL" }]
+    },
+    {
+      "id": "bme",
+      "label": "BME280 sensor breakout",
+      "short": "BME280",
+      "pins": [{ "label": "VCC" }, { "label": "GND" }, { "label": "SDA" }, { "label": "SCL" }]
+    }
+  ],
+  "nets": [
+    { "id": "PWR", "phase": "Power & ground", "from": "pi.P17 3V3", "to": "bme.VCC", "color": "#e879f9", "label": "Pi P17 3V3 → BME280 VCC", "note": "Physical pin 17 is a real 3V3 pin — validation passes and the guide renders." },
+    { "id": "GNDW", "from": "pi.P6 GND", "to": "bme.GND", "color": "gnd", "label": "Pi P6 GND → BME280 GND" },
+    { "id": "SDA", "phase": "I2C", "from": "pi.P3 SDA", "to": "bme.SDA", "color": "cap", "label": "Pi P3 SDA → BME280 SDA" },
+    { "id": "SCL", "from": "pi.P5 SCL", "to": "bme.SCL", "color": "cap", "label": "Pi P5 SCL → BME280 SCL" }
+  ],
+  "meta": {
+    "title": "DEMO — sensor VCC on Pi pin 17 (renders clean)",
+    "intro": "The corrected twin of demo-pin15-vcc-wrong.json: same build, VCC moved to physical pin 17 (a real 3V3 pin). Validation passes; the guide draws."
+  }
+}

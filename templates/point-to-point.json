@@ -1,0 +1,19 @@
+{
+  "mode": "point-to-point",
+  "components": [
+    { "id": "mcu", "label": "Your controller", "short": "MCU", "hub": true,
+      "pins": [{ "label": "3V3" }, { "label": "GND" }, { "label": "SDA" }, { "label": "SCL" }] },
+    { "id": "mod", "label": "Your I²C module", "short": "MOD",
+      "pins": [{ "label": "VCC" }, { "label": "GND" }, { "label": "SDA" }, { "label": "SCL" }] }
+  ],
+  "nets": [
+    { "id": "PWR", "phase": "Power", "from": "mcu.3V3", "to": "mod.VCC", "color": "in", "label": "3V3 → VCC" },
+    { "id": "GNDW", "from": "mcu.GND", "to": "mod.GND", "color": "gnd", "label": "GND → GND" },
+    { "id": "SDA", "phase": "I²C", "from": "mcu.SDA", "to": "mod.SDA", "color": "sig", "label": "SDA" },
+    { "id": "SCL", "from": "mcu.SCL", "to": "mod.SCL", "color": "sig", "label": "SCL" }
+  ],
+  "meta": {
+    "title": "Point-to-point — starter template",
+    "intro": "No board — module pins wired straight to a controller. Replace the two placeholder components (and their pins) with your own; net endpoints are <code>\"component.pin\"</code>. Add <code>\"pinout\": \"raspberry-pi-40\"</code> to a component to turn on can't-be-wrong validation."
+  }
+}

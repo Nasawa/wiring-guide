@@ -1,0 +1,20 @@
+{
+  "mode": "point-to-point",
+  "components": [
+    { "id": "pico", "label": "Raspberry Pi Pico", "short": "Pico", "hub": true,
+      "pinout": "raspberry-pi-pico",
+      "pins": [{ "label": "P36 3V3(OUT)" }, { "label": "P38 GND" }, { "label": "P1 GP0" }, { "label": "P2 GP1" }] },
+    { "id": "mod", "label": "Your I²C module", "short": "MOD",
+      "pins": [{ "label": "VCC" }, { "label": "GND" }, { "label": "SDA" }, { "label": "SCL" }] }
+  ],
+  "nets": [
+    { "id": "PWR", "phase": "Power", "from": "pico.P36 3V3(OUT)", "to": "mod.VCC", "color": "in", "label": "3V3 → VCC" },
+    { "id": "GNDW", "from": "pico.P38 GND", "to": "mod.GND", "color": "gnd", "label": "GND → GND" },
+    { "id": "SDA", "phase": "I²C", "from": "pico.P1 GP0", "to": "mod.SDA", "color": "sig", "label": "GP0 → SDA" },
+    { "id": "SCL", "from": "pico.P2 GP1", "to": "mod.SCL", "color": "sig", "label": "GP1 → SCL" }
+  ],
+  "meta": {
+    "title": "Raspberry Pi Pico → I²C module — starter template",
+    "intro": "Point-to-point with can't-be-wrong validation on (component <code>pinout: \"raspberry-pi-pico\"</code>). Pin names are physical positions: <code>P36 3V3(OUT)</code>, <code>P1 GP0</code>. Wire a power line to a GP pin by mistake and it refuses to render. Replace GP0/GP1 with whichever pins you use."
+  }
+}

@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node version
+        run: node --version
+
+      - name: Run validation tests
+        run: node test/run-validation.js
+
+      # Real-Chromium layout/contrast/ARIA checks. The deps are provisioned
+      # here and BROWSER_SMOKE_REQUIRED=1 makes a missing browser or missing
+      # axe-core a FAILURE, not a skip — the browser claims are enforced.
+      - name: Install browser test deps (playwright + axe-core, not saved)
+        run: npm install --no-save --no-package-lock playwright@1 axe-core@4 && npx playwright install chromium
+
+      - name: Browser smoke test (real Chromium + axe; must not skip)
+        run: node test/browser-smoke.js
+        env:
+          BROWSER_SMOKE_REQUIRED: "1"

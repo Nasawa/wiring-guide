@@ -1,0 +1,17 @@
+{
+  "board": { "preset": "breadboard-half" },
+  "components": [
+    { "id": "mod", "label": "Your module", "socket": true, "span": [[8, 4], [10, 8]],
+      "pins": [{ "label": "VCC", "loc": [8, 4] }, { "label": "GND", "loc": [9, 4] }, { "label": "SIG", "loc": [10, 4] }] }
+  ],
+  "nets": [
+    { "id": "PWR", "kind": "jumper", "from": [8, 4], "to": [8, 2], "color": "in", "label": "VCC → + rail" },
+    { "id": "GNDW", "kind": "jumper", "from": [9, 4], "to": [9, 1], "color": "gnd", "label": "GND → − rail" }
+  ],
+  "legend": [ { "color": "in", "label": "power" }, { "color": "gnd", "label": "ground" } ],
+  "meta": {
+    "title": "Breadboard (half, 400-pt) — starter template",
+    "intro": "Terminal strips are vertical 5-hole columns (a–e = rows 4–8, f–j = rows 10–14) split by the center ravine (row 9). Power rails run along rows 1–2 (top) and 16–17 (bottom). Replace the placeholder module with your own parts.",
+    "buildOrder": [ "Seat parts across the ravine, then wire power (+ rail) and ground (− rail) first." ]
+  }
+}

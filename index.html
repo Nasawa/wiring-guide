@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wiring Guide Playground</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1117'/%3E%3Ccircle cx='8' cy='10' r='2.5' fill='%232d3340'/%3E%3Ccircle cx='24' cy='10' r='2.5' fill='%232d3340'/%3E%3Ccircle cx='8' cy='22' r='2.5' fill='%232d3340'/%3E%3Ccircle cx='24' cy='22' r='2.5' fill='%232d3340'/%3E%3Cpath d='M8 10 C 16 10 16 22 24 22' fill='none' stroke='%23c084fc' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{--bg:#0d1117;--fg:#e6edf3;--muted:#8b949e;--panel:#161b22;--border:#30363d;color-scheme:dark;}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
+    font:14px/1.5 -apple-system,"Segoe UI",system-ui,sans-serif;}
+  /* The page is a flex column: the header takes whatever height it needs
+     (it WRAPS on narrow screens) and .split gets the rest — no hard-coded
+     header height anywhere. */
+  body{display:flex;flex-direction:column;}
+  header{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);
+    flex:0 0 auto;min-width:0;}
+  header h1{font-size:15px;margin:0;color:#c084fc;}
+  header .sp{flex:1;}
+  button{background:#21262d;color:var(--fg);border:1px solid var(--border);border-radius:6px;
+    padding:6px 12px;cursor:pointer;font-size:13px;}
+  button:hover{border-color:#c084fc;}
+  /* Long parse errors wrap inside the header instead of widening the page. */
+  #err{color:#fca5a5;font-size:12px;font-family:ui-monospace,Menlo,monospace;min-height:16px;
+    flex:1 1 220px;min-width:0;overflow-wrap:anywhere;}
+  .split{display:grid;grid-template-columns:440px minmax(0,1fr);flex:1 1 auto;min-height:0;}
+  /* Single column: the editor keeps a real, usable height (45% of the
+     viewport, never under 280px) and the preview scrolls in the remainder. */
+  @media(max-width:900px){.split{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(280px,45vh) minmax(0,1fr);}}
+  .spec-wrap{position:relative;width:100%;min-height:0;box-sizing:border-box;background:#0b0e14;
+    border-right:1px solid var(--border);overflow:hidden;}
+  @media(max-width:900px){.spec-wrap{border-right:0;border-bottom:1px solid var(--border);}}
+  /* Reserve a stable classic-scrollbar gutter on both layers to keep wrap widths aligned. */
+  #spec,#spec-hl{margin:0;box-sizing:border-box;padding:12px;font:12px/1.5 ui-monospace,Menlo,monospace;
+    border:0;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;position:absolute;
+    inset:0;width:100%;height:100%;overflow:auto;scrollbar-gutter:stable;}
+  #spec-hl{pointer-events:none;z-index:1;color:#cbd5e1;background:transparent;overflow:hidden;}
+  #spec-hl code{font:inherit;}
+  #spec{z-index:2;background:transparent;color:transparent;caret-color:#cbd5e1;resize:none;
+    outline:none;overflow:auto;}
+  .tok-key{color:#79c0ff}.tok-str{color:#a5d6ff}.tok-num{color:#f2cc60}
+  .tok-bool{color:#ff7b72}.tok-null{color:#ff7b72}.tok-punct{color:#8b949e}
+  #preview{overflow:auto;padding:20px;min-height:0;min-width:0;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Wiring Guide Playground</h1>
+  <button id="load">Load divider demo (board mode)</button>
+  <button id="loadbad">Load pin-15 demo (must FAIL)</button>
+  <button id="loadgood">Load pin-17 demo (clean)</button>
+  <button id="dl">Download standalone HTML</button>
+  <span class="sp"></span>
+  <span id="err"></span>
+</header>
+<div class="split">
+  <div class="spec-wrap">
+    <pre id="spec-hl" aria-hidden="true"><code id="spec-hl-code"></code></pre>
+    <textarea id="spec" spellcheck="false" placeholder="Paste a wiring spec (JSON)…"></textarea>
+  </div>
+  <div id="preview"></div>
+</div>
+
+<script src="wiring.js"></script>
+<script>
+const specEl = document.getElementById('spec');
+const preview = document.getElementById('preview');
+const errEl = document.getElementById('err');
+let timer, lastSpec = null;
+
+function render() {
+  let obj;
+  try { obj = JSON.parse(specEl.value); }
+  catch (e) {
+    const message = e && e.message ? e.message : String(e);
+    let line = null;
+    try {
+      const lineMatch = /line (\d+)/.exec(message);
+      if (lineMatch) line = Number(lineMatch[1]);
+      else {
+        const positionMatch = /position (\d+)/.exec(message);
+        if (positionMatch) line = specEl.value.slice(0, Number(positionMatch[1])).split('\n').length;
+      }
+    } catch (_) {}
+    errEl.textContent = line ? 'JSON (line ' + line + '): ' + message : 'JSON: ' + message;
+    return;
+  }
+  errEl.textContent = '';
+  lastSpec = obj;
+  try { renderWiringGuide(obj, preview); }
+  catch (e) {
+    // WiringValidationError already mounted its own error box in the preview —
+    // just summarize in the status strip. Anything else is a real render crash.
+    errEl.textContent = (e && e.name === 'WiringValidationError')
+      ? `validation: ${e.errors.length} error(s) — see the red box`
+      : 'render: ' + e.message;
+  }
+}
+
+function highlightJSON(src) {
+  const escaped = String(src).replace(/[&<>]/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[ch]));
+  const tokenRe = /(\s+)|("(?:\\.|[^"\\])*")|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|(true|false|null)|([{}\[\],:])/g;
+  let html = '', last = 0, match;
+  while ((match = tokenRe.exec(escaped))) {
+    html += escaped.slice(last, match.index);
+    const token = match[0];
+    if (match[2]) {
+      const kind = /^\s*:/.test(escaped.slice(tokenRe.lastIndex)) ? 'key' : 'str';
+      html += '<span class="tok-' + kind + '">' + token + '</span>';
+    } else if (match[3]) html += '<span class="tok-num">' + token + '</span>';
+    else if (match[4]) html += '<span class="tok-' + (token === 'null' ? 'null' : 'bool') + '">' + token + '</span>';
+    else if (match[5]) html += '<span class="tok-punct">' + token + '</span>';
+    else html += token;
+    last = tokenRe.lastIndex;
+  }
+  return html + escaped.slice(last) + '\n';
+}
+
+function refreshHighlight() {
+  document.getElementById('spec-hl-code').innerHTML = highlightJSON(specEl.value);
+}
+
+specEl.addEventListener('input', () => {
+  refreshHighlight();
+  clearTimeout(timer); timer = setTimeout(render, 300);
+});
+specEl.addEventListener('scroll', () => {
+  const hl = document.getElementById('spec-hl');
+  hl.scrollTop = specEl.scrollTop;
+  hl.scrollLeft = specEl.scrollLeft;
+});
+
+async function loadSpec(path) {
+  const r = await fetch(path);
+  specEl.value = await r.text();
+  refreshHighlight();
+  render();
+}
+document.getElementById('load').addEventListener('click', () => loadSpec('specs/demo-divider-adc.json'));
+document.getElementById('loadbad').addEventListener('click', () => loadSpec('specs/demo-pin15-vcc-wrong.json'));
+document.getElementById('loadgood').addEventListener('click', () => loadSpec('specs/demo-pin17-vcc-correct.json'));
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+// Escape "<" in JSON destined for inline <script> text so a spec field
+// containing a script-closing sequence (written here as "<\/script>", never
+// literally, so this very comment can't trigger the bug it describes) or an
+// HTML comment-opener sequence can't terminate the element early. This is
+// the standard technique recommended by the JSON spec's authors for
+// embedding JSON in HTML; it round-trips through JSON.parse unchanged.
+function jsonForInlineScript(value) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
+document.getElementById('dl').addEventListener('click', async () => {
+  if (!lastSpec) return;
+  const lib = await (await fetch('wiring.js')).text();
+  const title = (lastSpec.meta && lastSpec.meta.title) || 'Wiring Guide';
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(title)}</title><style>body{margin:0;background:#0d1117;padding:24px;max-width:1500px;margin:0 auto;}</style></head>
+<body><div id="app"></div>
+<script>${lib}<\/script>
+<script>renderWiringGuide(${jsonForInlineScript(lastSpec)}, document.getElementById('app'));<\/script>
+</body></html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+  a.download = (lastSpec.meta && lastSpec.meta.title ? lastSpec.meta.title.replace(/[^\w]+/g, '-').toLowerCase() : 'wiring-guide') + '.html';
+  a.click();
+});
+
+// auto-load the example on first open
+document.getElementById('load').click();
+</script>
+</body>
+</html>

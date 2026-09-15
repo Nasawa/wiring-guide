@@ -1,0 +1,44 @@
+{
+  "mode": "point-to-point",
+  "components": [
+    {
+      "id": "nodemcu",
+      "label": "ESP8266 NodeMCU v1.0",
+      "short": "NodeMCU",
+      "hub": true,
+      "pinout": "esp8266-nodemcu-v1",
+      "pins": [{ "label": "3V3" }, { "label": "GND" }, { "label": "D2/GPIO4" }, { "label": "D1/GPIO5" }]
+    },
+    {
+      "id": "oled",
+      "label": "SSD1306 0.96\" I2C OLED",
+      "short": "OLED",
+      "pins": [{ "label": "VCC" }, { "label": "GND" }, { "label": "SDA" }, { "label": "SCL" }]
+    }
+  ],
+  "nets": [
+    { "id": "PWR", "phase": "Power & ground", "from": "nodemcu.3V3", "to": "oled.VCC", "color": "in", "label": "NodeMCU 3V3 → OLED VCC" },
+    { "id": "GNDW", "from": "nodemcu.GND", "to": "oled.GND", "color": "gnd", "label": "NodeMCU GND → OLED GND" },
+    { "id": "SDA", "phase": "I2C", "from": "nodemcu.D2/GPIO4", "to": "oled.SDA", "color": "cap", "label": "NodeMCU D2 (GPIO4) → OLED SDA" },
+    { "id": "SCL", "from": "nodemcu.D1/GPIO5", "to": "oled.SCL", "color": "cap", "label": "NodeMCU D1 (GPIO5) → OLED SCL" }
+  ],
+  "meta": {
+    "title": "ESP8266 NodeMCU → I2C OLED (SSD1306)",
+    "intro": "Wire a 0.96\" SSD1306 I2C OLED to an ESP8266 NodeMCU. Note the classic ESP8266 gotcha the pinout data guards against: the silkscreen D-labels are NOT the GPIO numbers — the default I2C bus is D2 = GPIO4 (SDA) and D1 = GPIO5 (SCL). Wire by the GPIO, not the D-number intuition.",
+    "notes": [
+      "NodeMCU pins are addressed by <strong>silkscreen label</strong>; the built-in pinout knows D2=GPIO4 and D1=GPIO5, so a spec cannot quietly put the bus on the wrong pin.",
+      "SSD1306 modules power from the NodeMCU <strong>3V3</strong> pin (many are 3–5V tolerant).",
+      "Default software-I2C on the ESP8266 Arduino core is SDA=GPIO4/D2, SCL=GPIO5/D1 — both remappable in code if needed."
+    ],
+    "buildOrder": [
+      "Power: NodeMCU 3V3 → OLED VCC, and a common GND.",
+      "I2C data: NodeMCU D2 (GPIO4) → OLED SDA.",
+      "I2C clock: NodeMCU D1 (GPIO5) → OLED SCL.",
+      "In code, Wire.begin(4, 5) (SDA, SCL) then drive the SSD1306 at its I2C address (0x3C typical)."
+    ],
+    "checks": [
+      "SDA lands on D2/GPIO4 and SCL on D1/GPIO5 (not the reverse, and not by D-number).",
+      "OLED VCC on 3V3, GND common."
+    ]
+  }
+}

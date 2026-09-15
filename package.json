@@ -1,0 +1,32 @@
+{
+  "name": "@anigeek/wiring-guide",
+  "version": "0.1.0",
+  "description": "Declarative JSON → SVG renderer for perfboard / stripboard / breadboard hand-wiring guides. Vanilla JS, no build step, no dependencies.",
+  "keywords": [
+    "perfboard",
+    "stripboard",
+    "breadboard",
+    "wiring",
+    "wiring-diagram",
+    "svg",
+    "electronics",
+    "prototyping"
+  ],
+  "license": "MIT",
+  "author": "Anigeek",
+  "private": true,
+  "main": "wiring.js",
+  "exports": {
+    ".": "./wiring.js",
+    "./wiring.js": "./wiring.js"
+  },
+  "files": [
+    "wiring.js",
+    "docs/spec.md"
+  ],
+  "scripts": {
+    "test": "node test/run-validation.js",
+    "test:browser": "node test/browser-smoke.js",
+    "playground": "python3 -m http.server 8801"
+  }
+}

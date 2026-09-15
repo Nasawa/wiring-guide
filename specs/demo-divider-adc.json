@@ -1,0 +1,69 @@
+{
+  "board": { "preset": "electrocookie-strip", "boards": 2 },
+  "components": [
+    {
+      "id": "esp",
+      "label": "ESP32 DevKit V1 (30-pin)",
+      "socket": true,
+      "span": [[13, 3], [22, 17]],
+      "pins": [{ "label": "EN", "loc": [13, 3] }, { "label": "VP/36", "loc": [13, 4] }, { "label": "VN/39", "loc": [13, 5] }, { "label": "GPIO34", "loc": [13, 6] }, { "label": "GPIO35", "loc": [13, 7] }, { "label": "GND", "loc": [13, 16] }, { "label": "VIN", "loc": [13, 17] }]
+    },
+    {
+      "id": "term",
+      "label": "Screw terminal (3-pin)",
+      "span": [[1, 3], [5, 3]],
+      "pins": [{ "label": "GND", "loc": [1, 3] }, { "label": "CH1+", "loc": [3, 3] }, { "label": "CH2+", "loc": [5, 3] }]
+    }
+  ],
+  "labels": {
+    "1,3": "GND", "3,3": "C1+", "5,3": "C2+",
+    "13,3": "EN", "13,4": "VP", "13,5": "VN", "13,6": "34", "13,7": "35", "13,16": "GND", "13,17": "VIN",
+    "1,16": "G", "1,7": "G", "1,11": "G"
+  },
+  "legend": [
+    { "color": "in", "label": "Rail+ input (RED probe, via screw terminal)" },
+    { "color": "r", "label": "10 kΩ (top) & 1 kΩ (bottom) divider resistors" },
+    { "color": "node", "label": "NODE tie (merges two 3-hole runs into one node)" },
+    { "color": "d", "label": "1N5819 reverse clamp (band/cathode faces NODE)" },
+    { "color": "sig", "label": "NODE → ESP ADC (GPIO34 / GPIO35)" },
+    { "color": "gnd", "label": "GND (to col-1 rail / Rb / diode / ESP GND)" }
+  ],
+  "nets": [
+    { "id": "JEG", "kind": "jumper", "from": [13, 16], "to": [1, 16], "color": "gnd", "label": "ESP GND → rail", "note": "ESP GND pin (left header row 16) → col-1 GND rail. Solder before seating the ESP." },
+    { "id": "R1a", "kind": "resistor", "value": "10 kΩ", "from": [2, 3], "to": [3, 5], "color": "r", "label": "CH1 10k (top)", "note": "Top leg at (2,3) — same run {2-4}@r3 as the CH1+ pin (3,3), so it shares that net WITHOUT fighting the screw pin for the hole. Bottom → NODE1 (3,5)." },
+    { "id": "NT1", "kind": "jumper", "from": [4, 5], "to": [5, 5], "color": "node", "label": "NODE1 tie", "note": "Merges runs {2-4} and {5-7} at row5 into NODE1 (cols 2–7)." },
+    { "id": "R1b", "kind": "resistor", "value": "1 kΩ", "from": [2, 5], "to": [2, 7], "color": "r", "label": "CH1 1k (bottom)", "note": "NODE1 → GL1 (CH1 local ground, row7)." },
+    { "id": "D1", "kind": "diode", "value": "1N5819", "from": [6, 7], "to": [6, 5], "color": "d", "label": "CH1 1N5819", "note": "BAND (cathode) at NODE1 (6,5); anode at GL1 (6,7)." },
+    { "id": "GT1", "kind": "jumper", "from": [4, 7], "to": [5, 7], "color": "gnd", "label": "GL1 tie", "note": "Merges {2-4} and {5-7} at row7 into CH1 local ground." },
+    { "id": "JG1", "kind": "jumper", "from": [3, 7], "to": [1, 7], "color": "gnd", "label": "GL1 → rail", "note": "CH1 local ground → col-1 GND rail." },
+    { "id": "S1", "kind": "jumper", "from": [7, 5], "to": [13, 6], "color": "sig", "label": "NODE1 → GPIO34", "note": "Divided CH1 voltage → ESP D34/GPIO34 (left header row 6)." },
+    { "id": "JF2", "kind": "jumper", "from": [6, 3], "to": [5, 6], "color": "in", "label": "CH2+ → divider", "note": "Top leg at (6,3) — same run {5-7}@r3 as the CH2+ pin (5,3), leaving the screw pin its own hole. Down to the CH2 feed (5,6)." },
+    { "id": "R2a", "kind": "resistor", "value": "10 kΩ", "from": [6, 6], "to": [5, 9], "color": "r", "label": "CH2 10k (top)", "note": "Top leg at (6,6) — same run {5-7}@r6 as the feed (5,6). Bottom → NODE2 (5,9)." },
+    { "id": "NT2", "kind": "jumper", "from": [7, 9], "to": [8, 9], "color": "node", "label": "NODE2 tie", "note": "Merges runs {5-7} and {8-10} at row9 into NODE2 (cols 5–10)." },
+    { "id": "R2b", "kind": "resistor", "value": "1 kΩ", "from": [6, 9], "to": [6, 11], "color": "r", "label": "CH2 1k (bottom)", "note": "NODE2 → GL2 (CH2 local ground, row11)." },
+    { "id": "D2", "kind": "diode", "value": "1N5819", "from": [9, 11], "to": [9, 9], "color": "d", "label": "CH2 1N5819", "note": "BAND (cathode) at NODE2 (9,9); anode at GL2 (9,11)." },
+    { "id": "GT2", "kind": "jumper", "from": [7, 11], "to": [8, 11], "color": "gnd", "label": "GL2 tie", "note": "Merges {5-7} and {8-10} at row11 into CH2 local ground." },
+    { "id": "JG2", "kind": "jumper", "from": [5, 11], "to": [1, 11], "color": "gnd", "label": "GL2 → rail", "note": "CH2 local ground → col-1 GND rail." },
+    { "id": "S2", "kind": "jumper", "from": [10, 9], "to": [13, 7], "color": "sig", "label": "NODE2 → GPIO35", "note": "Divided CH2 voltage → ESP D35/GPIO35 (left header row 7)." }
+  ],
+  "meta": {
+    "title": "2-Channel ÷11 Voltage Divider → ESP32 ADC (demo)",
+    "intro": "DEMO: a 2-channel ÷11 resistor voltage divider feeding an ESP32's ADC, built on two snapped ElectroCookie strip boards (34×19). Rails are the outer column of each board (cols 1/17/18/34); the field is horizontal 3-hole runs. An ESP32 DevKit V1 (30-pin) sits centered, left header at col 13. Shows board mode with resistor, diode, and node-tie net kinds.",
+    "notes": [
+      { "type": "ok", "html": "<strong>Header layout.</strong> Left header (col 13), pins top→bottom: EN(3), VP(4), VN(5), <strong>GPIO34(6), GPIO35(7)</strong>, …, <strong>GND(16), VIN(17)</strong> — USB at the top (EN) end. The ADC-capable pins sit near the top, right by the channels." }
+    ],
+    "buildOrder": [
+      "<strong>Sockets + terminal first.</strong> Female headers for the DevKit (cols 13 & 22, USB at the top/EN edge — VIN lands at row 17, GND at row 16) and the 3-pin screw terminal (row 3, GND pin on the col-1 rail).",
+      "<strong>Grounds first:</strong> JEG (ESP GND → col-1 rail), JG1, JG2. Verify terminal-GND ↔ ESP-GND ↔ col-1 rail = 0 Ω.",
+      "<strong>CH1:</strong> R1a (10k), tie NT1, R1b (1k), D1 (band toward NODE1), tie GT1, then S1 (NODE1 → GPIO34).",
+      "<strong>CH2:</strong> feed JF2, R2a (10k), tie NT2, R2b (1k), D2, tie GT2, S2 (NODE2 → GPIO35).",
+      "<strong>Pre-power check</strong> (below), then plug in the ESP via USB."
+    ],
+    "checks": [
+      "<strong>Continuity, power off:</strong> terminal GND ↔ ESP GND ↔ col-1 rail = 0 Ω. CH1+ ↔ NODE1 ≈ 10 kΩ; NODE1 ↔ GND ≈ 1 kΩ. Same for CH2.",
+      "<strong>Divider, 12 V into CH1+/GND:</strong> NODE1 ≈ 1.09 V (12 ÷ 11). ~12 V → bottom 1 kΩ open; ~0 V → top 10 kΩ open.",
+      "<strong>Reverse clamp:</strong> briefly reverse CH1 leads — NODE1 clamps to ≈ −0.3 V. If it swings hard negative, the 1N5819 band is backwards.",
+      "Then plug in the ESP over USB and read the two ADC channels (GPIO34/GPIO35); calibrate the divider ratio against a known-good meter."
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "mode": "point-to-point",
+  "components": [
+    {
+      "id": "uno",
+      "label": "Arduino Uno R3",
+      "short": "Uno",
+      "hub": true,
+      "pinout": "arduino-uno-r3",
+      "pins": [{ "label": "5V" }, { "label": "GND" }, { "label": "D2" }, { "label": "D3" }]
+    },
+    {
+      "id": "sonar",
+      "short": "HC-SR04",
+      "module": "hc-sr04"
+    }
+  ],
+  "nets": [
+    { "id": "PWR", "phase": "Power & ground", "from": "uno.5V", "to": "sonar.VCC", "color": "in", "label": "Uno 5V → HC-SR04 VCC" },
+    { "id": "GNDW", "from": "uno.GND", "to": "sonar.GND", "color": "gnd", "label": "Uno GND → HC-SR04 GND" },
+    { "id": "TRIG", "phase": "Signals", "from": "uno.D2", "to": "sonar.TRIG", "color": "sig", "label": "Uno D2 → HC-SR04 TRIG" },
+    { "id": "ECHO", "from": "uno.D3", "to": "sonar.ECHO", "color": "sig", "label": "Uno D3 → HC-SR04 ECHO" }
+  ],
+  "meta": {
+    "title": "Arduino Uno → HC-SR04 ultrasonic ranger",
+    "intro": "A minimal distance-sensor build that shows off the module registry: the sensor is declared as just \"module\": \"hc-sr04\" — no hand-listed pins — and the validator still knows VCC is power, GND is ground, and TRIG/ECHO are signals, so it rejects (for example) wiring 5V onto TRIG.",
+    "notes": [
+      "The HC-SR04 is a <strong>5V</strong> part — power VCC from the Uno's 5V pin, not 3V3.",
+      { "type": "warn", "html": "HC-SR04 <strong>ECHO is 5V logic</strong>. It is safe straight into a 5V Uno, but on a 3.3V MCU (ESP32/Pi) divide or level-shift ECHO first." },
+      "Pins came from the built-in <code>hc-sr04</code> module: VCC (power), TRIG (signal in), ECHO (signal out), GND. Author pins/roles override the defaults when needed."
+    ],
+    "buildOrder": [
+      "Power: Uno 5V → HC-SR04 VCC, and a common GND.",
+      "Trigger: Uno D2 → HC-SR04 TRIG.",
+      "Echo: Uno D3 → HC-SR04 ECHO.",
+      "In code, pulse TRIG HIGH for 10µs, then time the ECHO HIGH pulse; distance_cm = pulse_us / 58."
+    ],
+    "checks": [
+      "VCC on 5V (not 3V3), GND common.",
+      "TRIG and ECHO on two distinct digital pins (D2/D3 here) — not swapped with power/ground."
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "mode": "point-to-point",
+  "components": [
+    {
+      "id": "pi",
+      "label": "Raspberry Pi Zero 2 W — 40-pin header",
+      "short": "Pi",
+      "hub": true,
+      "pinout": "raspberry-pi-40",
+      "pins": [{ "label": "P15 GPIO22" }, { "label": "P17 3V3" }, { "label": "P6 GND" }, { "label": "P3 SDA" }, { "label": "P5 SCL" }]
+    },
+    {
+      "id": "bme",
+      "label": "BME280 sensor breakout",
+      "short": "BME280",
+      "pins": [{ "label": "VCC" }, { "label": "GND" }, { "label": "SDA" }, { "label": "SCL" }]
+    }
+  ],
+  "nets": [
+    { "id": "PWR", "phase": "Power & ground", "from": "pi.P15 GPIO22", "to": "bme.VCC", "color": "#e879f9", "label": "Pi P15 → BME280 VCC", "note": "Deliberate miswire: pin 15 is GPIO22, not 3V3. The sensor browns out at ~1.5 V and looks dead. Validation must refuse to draw this." },
+    { "id": "GNDW", "from": "pi.P6 GND", "to": "bme.GND", "color": "gnd", "label": "Pi P6 GND → BME280 GND" },
+    { "id": "SDA", "phase": "I2C", "from": "pi.P3 SDA", "to": "bme.SDA", "color": "cap", "label": "Pi P3 SDA → BME280 SDA" },
+    { "id": "SCL", "from": "pi.P5 SCL", "to": "bme.SCL", "color": "cap", "label": "Pi P5 SCL → BME280 SCL" }
+  ],
+  "meta": {
+    "title": "DEMO — sensor VCC on Pi pin 15 (MUST FAIL VALIDATION)",
+    "intro": "Regression demo for a classic Pi wiring mistake: BME280 VCC wired to physical pin 15 (GPIO22) instead of pin 17 (3V3). If this spec ever renders a diagram, the can't-be-wrong guarantee is broken."
+  }
+}

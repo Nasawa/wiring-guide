@@ -1,0 +1,44 @@
+{
+  "meta": {
+    "title": "Jumperless V5 — LED blink (node-numbered)",
+    "intro": "A single LED driven from the top rail through a current-limiting resistor to ground, laid out on a Jumperless V5. Because you make connections in software on a Jumperless, every terminal strip is labeled with its ROUTING NODE NUMBER (1–30 on the top half, 31–60 on the bottom) — the same numbers you'll type when you route the nets.",
+    "notes": [
+      "The Jumperless is physically a 30-column half-breadboard. The strip directly across the center ravine from node N is <strong>node N+30</strong>.",
+      { "type": "warn", "html": "Rails: <strong>TOP_RAIL</strong> and <strong>BOTTOM_RAIL</strong> are the two adjustable rails; the companion line is GND (the bottom rail is often used as GND). The +/− line assignment within each rail pair follows standard breadboard silkscreen — confirm against your board's red/blue markings." },
+      "In software you'd route: node 10 → TOP_RAIL, node 12 → GND. The physical jumpers below mirror those two routes plus the LED and resistor."
+    ],
+    "buildOrder": [
+      "Seat the LED across nodes 10 (anode, long leg) and 11 (cathode).",
+      "Place the 330Ω resistor from node 11 to node 12.",
+      "Jumper node 10 to TOP_RAIL, and node 12 to GND (or route those two nets in software).",
+      "Set TOP_RAIL to ~3.3 V and the LED lights."
+    ],
+    "checks": [
+      "LED long leg (anode) is on node 10, short leg (cathode) on node 11.",
+      "Resistor bridges node 11 → node 12.",
+      "TOP_RAIL reaches node 10; node 12 reaches GND."
+    ]
+  },
+  "board": { "preset": "jumperless" },
+  "components": [
+    {
+      "id": "led",
+      "label": "LED",
+      "span": [[10, 4], [11, 8]],
+      "pins": [
+        { "label": "A · node 10", "loc": [10, 4], "notes": "anode / long leg" },
+        { "label": "K · node 11", "loc": [11, 4], "notes": "cathode / short leg" }
+      ]
+    }
+  ],
+  "nets": [
+    { "id": "pwr", "kind": "jumper", "from": [10, 5], "to": [10, 1], "color": "in", "label": "node 10 → TOP_RAIL" },
+    { "id": "r1", "kind": "resistor", "from": [11, 5], "to": [12, 4], "value": "330Ω", "label": "node 11 → node 12" },
+    { "id": "gnd", "kind": "jumper", "from": [12, 5], "to": [12, 2], "color": "gnd", "label": "node 12 → GND" }
+  ],
+  "legend": [
+    { "color": "in", "label": "power (TOP_RAIL)" },
+    { "color": "gnd", "label": "ground" },
+    { "color": "r", "label": "resistor" }
+  ]
+}
