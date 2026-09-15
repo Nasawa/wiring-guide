@@ -1,5 +1,7 @@
 # wiring-guide
 
+[![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-Support-FF5E5B.svg?logo=ko-fi&logoColor=white)](https://ko-fi.com/anigeekapps)
+
 A tiny, declarative renderer for hand-wiring guides (perfboard / stripboard /
 breadboard). Define the **board**, **components**, and **wires** as a JSON spec;
 get back an interactive, color-coded guide you'd otherwise hand-build per project —
@@ -214,6 +216,9 @@ validation pass and the `require()` path run on any maintained Node (≥ 14).
 Full net-tracing DRC (a node-overflow check beyond the cheap duplicate-hole subset),
 a library of ready-to-use board presets (see the open issues), Wokwi interop, and
 render/display configurability are deferred.
+
+## Support
+If wiring-guide saved you an afternoon of hand-coding, [a coffee on Ko-fi](https://ko-fi.com/anigeekapps) is always appreciated. ☕
 
 ## License
 [MIT](LICENSE) © Anigeek
